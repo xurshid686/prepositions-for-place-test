@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { studentName, score, total, timeSpent, timestamp, testType } = req.body;
+    const { studentName, score, total, timeSpent, timestamp } = req.body;
 
     // Validate required fields
     if (!studentName || score === undefined || !total || !timeSpent) {
@@ -34,42 +34,37 @@ module.exports = async (req, res) => {
     // Create message for Telegram
     const percentage = ((score / total) * 100).toFixed(1);
     const message = `
-📚 *Uzbek-English Translation Test Result*
+📚 *Prepositions Test Result*
 👤 *Student:* ${studentName}
 📊 *Score:* ${score}/${total} (${percentage}%)
 ⏱️ *Time Spent:* ${timeSpent}
 📅 *Completed:* ${new Date(timestamp).toLocaleString()}
-🔄 *Test Type:* Uzbek to English Translation with Prepositions
     `.trim();
 
-    // Send message to Telegram if credentials are available
-    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-      const telegramResponse = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown',
-          }),
-        }
-      );
-
-      if (!telegramResponse.ok) {
-        console.error('Telegram API error:', await telegramResponse.text());
-        return res.status(500).json({ error: 'Failed to send message to Telegram' });
+    // Send message to Telegram
+    const telegramResponse = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown',
+        }),
       }
-    } else {
-      console.log('Telegram credentials not set. Message would be:', message);
+    );
+
+    if (!telegramResponse.ok) {
+      console.error('Telegram API error:', await telegramResponse.text());
+      return res.status(500).json({ error: 'Failed to send message to Telegram' });
     }
 
     res.status(200).json({ 
       success: true, 
-      message: 'Results processed successfully' 
+      message: 'Results sent to Telegram successfully' 
     });
   } catch (error) {
     console.error('Error processing results:', error);
