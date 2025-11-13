@@ -1,7 +1,7 @@
 {
-  "name": "prepositions-translation-test",
+  "name": "prepositions-test",
   "version": "1.0.0",
-  "description": "An Uzbek to English translation test for prepositions of place with Telegram integration",
+  "description": "Prepositions of Place Test with Telegram integration",
   "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
