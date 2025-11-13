@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "prepositions-translation-test",
+  "name": "prepositions-test",
   "builds": [
     {
       "src": "package.json",
