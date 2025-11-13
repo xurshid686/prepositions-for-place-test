@@ -24,6 +24,15 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Check if Telegram credentials are set
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      console.error('Telegram credentials not set');
+      return res.status(500).json({ 
+        error: 'Telegram credentials not configured',
+        details: 'Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables'
+      });
+    }
+
     const { studentName, score, total, timeSpent, timestamp } = req.body;
 
     // Validate required fields
@@ -41,6 +50,8 @@ module.exports = async (req, res) => {
 📅 *Completed:* ${new Date(timestamp).toLocaleString()}
     `.trim();
 
+    console.log('Sending to Telegram:', { studentName, score, total, timeSpent });
+
     // Send message to Telegram
     const telegramResponse = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
@@ -57,17 +68,27 @@ module.exports = async (req, res) => {
       }
     );
 
+    const responseData = await telegramResponse.json();
+
     if (!telegramResponse.ok) {
-      console.error('Telegram API error:', await telegramResponse.text());
-      return res.status(500).json({ error: 'Failed to send message to Telegram' });
+      console.error('Telegram API error:', responseData);
+      return res.status(500).json({ 
+        error: 'Failed to send message to Telegram',
+        details: responseData.description 
+      });
     }
 
+    console.log('Telegram message sent successfully');
     res.status(200).json({ 
       success: true, 
       message: 'Results sent to Telegram successfully' 
     });
+
   } catch (error) {
     console.error('Error processing results:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
   }
 };
