@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
-    "start": "serve -s ."
+    "start": "serve -s .",
+    "vercel-build": "echo 'Building static site'"
   },
   "dependencies": {
     "serve": "^14.2.0"
